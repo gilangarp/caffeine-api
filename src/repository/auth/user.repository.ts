@@ -43,7 +43,7 @@ export const getAllData = (
 export const getTotalData = (): Promise<
   QueryResult<{ total_user: string }>
 > => {
-  let query = 'select count(*) as "total_user" from users';
+  let query = 'select count(*) as "total_user" from users where isdelete = false';
   return db.query(query);
 };
 
