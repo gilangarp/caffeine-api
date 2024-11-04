@@ -23,8 +23,10 @@ export const createData = (
 export const getAllData = (
   queryParams: IUsersQuery
 ): Promise<QueryResult<IUserProfileData>> => {
-  let query = ` select u.id, p.profile_image, p.full_name,p.phone_number,p.address , user_email from users u inner join profile p on u.id = p.user_id 
-order by created_at asc`;
+  let query = ` select u.id, p.profile_image, p.full_name,p.phone_number,p.address , user_email from users u 
+  inner join profile p on u.id = p.user_id 
+  WHERE u.isdelete = false
+  order by created_at asc`;
   let value = [];
   const { page, limit } = queryParams;
 
