@@ -1,4 +1,4 @@
-import { Request, Response } from 'express';
+import { Request, Response } from "express";
 import {
   IRegisterResponse,
   IUserRegisterBody,
@@ -9,6 +9,11 @@ import sendMail from "../../helper/nodemailer";
 import { IProfileBody } from "../../model/auth/profile.model";
 import { createDataProfile } from "../../repository/auth/profile.repository";
 import bcrypt from "bcrypt";
+import { IAuthResponse, IUserLoginBody } from "../../model/auth/auth.model";
+import { GetByEmail } from "../../repository/auth/auth.repository";
+import { IPayload } from "../../model/auth/payload.model";
+import jwt from 'jsonwebtoken'
+import { jwtOptions } from "../../middleware/authorization.middleware";
 
 export const register = async (
   req: Request<{}, {}, IUserRegisterBody>,
@@ -131,5 +136,68 @@ export const register = async (
     });
   } finally {
     client.release();
+  }
+};
+
+export const login = async (
+  req: Request<{}, {}, IUserLoginBody>,
+  res: Response<IAuthResponse>
+) => {
+  const { user_email, user_pass } = req.body;
+  try {
+    const result = await GetByEmail(user_email);
+
+    if (!result.rows.length)
+      throw new Error("The email you entered is incorrect");
+
+    const { user_pass: hash, id, role } = result.rows[0];
+
+    const isPwdValid = await bcrypt.compare(user_pass, hash);
+    if (!isPwdValid) throw new Error("The password you entered is incorrect");
+
+    const payload: IPayload = {
+      user_email: user_email,
+      role: role,
+    };
+
+    const token = jwt.sign(
+      payload,
+      process.env.JWT_SECRET as string,
+      jwtOptions
+    );
+
+    return res.status(200).json({
+      code: 200,
+      msg: `Welcome, ${user_email}!`,
+      data: [{ token, id, role }],
+    });
+  } catch (error) {
+    if (error instanceof Error) {
+      if (/(invalid(.)+id(.)+)/g.test(error.message)) {
+        return res.status(401).json({
+          code: 401,
+          msg: "Error",
+          error: {
+            message: "User not found",
+          },
+        });
+      }
+
+      return res.status(401).json({
+        code: 401,
+        msg: "Error",
+        error: {
+          message: error.message,
+        },
+      });
+    }
+
+    return res.status(500).json({
+      code: 500,
+      msg: "Error",
+      error: {
+        message: "Internal Server Error",
+      },
+    });
   }
 };
