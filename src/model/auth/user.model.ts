@@ -25,3 +25,21 @@ export interface IUsersQuery {
   limit: string;
   [key: string]: any;
 }
+
+export interface IUserProfileData {
+  id: string;
+  profile_image: string;
+  full_name: string;
+  phone_number: string;
+  address: string;
+  user_email: string;
+}
+
+export interface IUserProfileResponse extends IBasicResponse{
+  data?: IUserProfileData[]
+}
+
+
+export interface IDelateResponse  extends IBasicResponse{
+  msg: string; 
+}

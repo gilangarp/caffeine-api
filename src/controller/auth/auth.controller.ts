@@ -1,10 +1,19 @@
 import { Request, Response } from "express";
 import {
+  IDelateResponse,
   IRegisterResponse,
+  IUserProfileResponse,
   IUserRegisterBody,
+  IUsersQuery,
 } from "../../model/auth/user.model";
 import db from "../../configs/pg";
-import { createData } from "../../repository/auth/user.repository";
+import {
+  createData,
+  delateData,
+  getAllData,
+  getTotalData,
+  updateData,
+} from "../../repository/auth/user.repository";
 import sendMail from "../../helper/nodemailer";
 import { IProfileBody } from "../../model/auth/profile.model";
 import { createDataProfile } from "../../repository/auth/profile.repository";
@@ -12,8 +21,9 @@ import bcrypt from "bcrypt";
 import { IAuthResponse, IUserLoginBody } from "../../model/auth/auth.model";
 import { GetByEmail } from "../../repository/auth/auth.repository";
 import { IPayload } from "../../model/auth/payload.model";
-import jwt from 'jsonwebtoken'
+import jwt from "jsonwebtoken";
 import { jwtOptions } from "../../middleware/authorization.middleware";
+import { getLink } from "../../helper/getLink";
 
 export const register = async (
   req: Request<{}, {}, IUserRegisterBody>,
@@ -197,6 +207,132 @@ export const login = async (
       msg: "Error",
       error: {
         message: "Internal Server Error",
+      },
+    });
+  }
+};
+
+export const FetchAll = async (
+  req: Request<{}, {}, {}, IUsersQuery>,
+  res: Response<IUserProfileResponse>
+) => {
+  try {
+    const result = await getAllData(req.query);
+    if (!result || !result.rows.length) {
+      return res.status(404).json({
+        code: 404,
+        msg: "Error",
+        error: {
+          message: "Data Not Found",
+        },
+      });
+    }
+
+    const dataProduct = await getTotalData();
+    const page = parseInt(req.query.page as string) || 1; // Default to 1
+    const limit = parseInt(req.query.limit as string) || 4; // Default to 4
+    const totalData = parseInt(dataProduct.rows[0]?.total_user || "0", 10);
+    const totalPage = Math.ceil(totalData / limit);
+
+    const response = {
+      code: 200,
+      msg: "User profile successfully retrieved",
+      data: result.rows,
+      meta: {
+        totalData,
+        totalPage,
+        page,
+        prevLink: page > 1 ? getLink(req, "previous") : null,
+        nextLink: page < totalPage ? getLink(req, "next") : null,
+      },
+    };
+
+    return res.status(200).json(response);
+  } catch (err: unknown) {
+    if (err instanceof Error) {
+      console.error(err.message);
+    }
+
+    return res.status(500).json({
+      code: 500,
+      msg: "Error",
+      error: {
+        message: "Internal Server Error",
+      },
+    });
+  }
+};
+
+export const update = async (
+  req: Request,
+  res: Response<IRegisterResponse>
+) => {
+  const { id } = req.params;
+  const { user_pass } = req.body;
+
+  try {
+    if (user_pass && user_pass.length < 6) {
+      return res.status(400).json({
+        code: 400,
+        msg: "Registration failed",
+        error: {
+          message: "Password must be at least 6 characters long.",
+        },
+      });
+    }
+
+    const salt = await bcrypt.genSalt();
+    const hashedPassword = await bcrypt.hash(user_pass, salt);
+
+    const result = await updateData(id, req.body, hashedPassword);
+    return res.status(200).json({
+      code: 200,
+      msg: "User has been upgraded",
+      data: result.rows,
+    });
+  } catch (err: unknown) {
+    let errorMessage = "Internal Server Error";
+
+    if (err instanceof Error) {
+      errorMessage = err.message;
+
+      if (errorMessage.includes('syntax error at or near "WHERE"')) {
+        return res.status(400).json({
+          code: 400,
+          msg: "Error",
+          error: {
+            message: "Error in the database query.",
+          },
+        });
+      }
+    }
+
+    return res.status(500).json({
+      code: 500,
+      msg: "Error",
+      error: {
+        message: errorMessage,
+      },
+    });
+  }
+};
+
+export const Delate = async (req: Request, res: Response<IDelateResponse>) => {
+  const { id } = req.params;
+  try {
+    const result = await delateData(id);
+    return res.status(200).json({
+      code: 200,
+      msg: result,
+    });
+  } catch (err: unknown) {
+    console.error(err);
+    let errorMessage = "Internal Server Error";
+    return res.status(500).json({
+      code: 500,
+      msg: "Error",
+      error: {
+        message: errorMessage,
       },
     });
   }
