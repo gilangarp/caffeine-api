@@ -6,7 +6,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "tsc --build",
     "start": "node ./dist/app.js",
-    "start:dev": "set NODE_ENV=development && nodemon app.ts",
+    "start:dev": "set NODE_ENV=development && nodemon --files app.ts",
     "start:prod": "set NODE_ENV=production && nodemon --files api.ts"
   },
   "keywords": [],

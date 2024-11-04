@@ -15,3 +15,13 @@ export interface IUserRegisterBody extends IUserBody {
 export interface IRegisterResponse extends IBasicResponse {
   data?: IDataUser[];
 }
+
+export interface IUsersParams {
+  id: string;
+}
+
+export interface IUsersQuery {
+  page: string;
+  limit: string;
+  [key: string]: any;
+}
