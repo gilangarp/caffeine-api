@@ -160,7 +160,16 @@ export const login = async (
     if (!result.rows.length)
       throw new Error("The email you entered is incorrect");
 
-    const { user_pass: hash, id, role } = result.rows[0];
+    const { user_pass: hash, id, role , isdelete  } = result.rows[0];
+    if (isdelete) {
+      return res.status(401).json({
+        code: 401,
+        msg: "Error",
+        error: {
+          message: "User has been deleted",
+        },
+      });
+    }
 
     const isPwdValid = await bcrypt.compare(user_pass, hash);
     if (!isPwdValid) throw new Error("The password you entered is incorrect");

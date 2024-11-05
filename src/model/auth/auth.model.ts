@@ -5,6 +5,7 @@ export interface IAuth {
   id: string;
   iss: string;
   role: string;
+  isdelete:boolean;
 }
 
 export interface IUserLoginBody {
