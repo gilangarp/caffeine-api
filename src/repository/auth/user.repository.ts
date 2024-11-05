@@ -87,7 +87,7 @@ export const checkIfUserExists = async (id: string) => {
   return IsCheck.rows[0].count > 0;
 };
 
-export const delateData = async (id: string): Promise<string> => {
+export const deleteData = async (id: string): Promise<string> => {
   const query = "UPDATE users SET isdelete = true WHERE id = $1";
   try {
     await db.query(query, [id]);

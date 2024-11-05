@@ -1,6 +1,6 @@
 import { Router } from "express";
 import {
-  Delate,
+  Delete,
   FetchAll,
   login,
   register,
@@ -13,4 +13,4 @@ authRouter.post("/register", register);
 authRouter.post("/login", login);
 authRouter.get("/", FetchAll);
 authRouter.patch("/setting/:id", update);
-authRouter.delete("/delate/:id", Delate);
+authRouter.delete("/delete/:id", Delete);

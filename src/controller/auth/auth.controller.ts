@@ -9,7 +9,7 @@ import {
 import db from "../../configs/pg";
 import {
   createData,
-  delateData,
+  deleteData,
   getAllData,
   getTotalData,
   updateData,
@@ -317,10 +317,10 @@ export const update = async (
   }
 };
 
-export const Delate = async (req: Request, res: Response<IDelateResponse>) => {
+export const Delete = async (req: Request, res: Response<IDelateResponse>) => {
   const { id } = req.params;
   try {
-    const result = await delateData(id);
+    const result = await deleteData(id);
     return res.status(200).json({
       code: 200,
       msg: result,
