@@ -5,6 +5,7 @@ import { categoryRouter } from "./category.router";
 import { productRouter } from "./product.model";
 import { promoRouter } from "./promo.router";
 import { testimonialRouter } from "./testimonial.router";
+import { sizeProductRouter } from "./sizeProduct.router";
 
 const mainRouter = Router();
 
@@ -14,5 +15,6 @@ const mainRouter = Router();
     mainRouter.use("/product", productRouter);
     mainRouter.use("/promo", promoRouter);
     mainRouter.use("/testimonial", testimonialRouter);
+    mainRouter.use("/size-product", sizeProductRouter);
 
 export default mainRouter;
