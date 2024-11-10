@@ -8,6 +8,7 @@ import { testimonialRouter } from "./testimonial.router";
 import { sizeProductRouter } from "./sizeProduct.router";
 import { paymentRouter } from "./payment.router";
 import { statusTransactionsRouter } from "./statusTransactions.router";
+import { transactionsRouter } from "./transactions.router";
 
 const mainRouter = Router();
 
@@ -20,5 +21,6 @@ const mainRouter = Router();
     mainRouter.use("/size-product", sizeProductRouter);
     mainRouter.use("/payment", paymentRouter)
     mainRouter.use("/status", statusTransactionsRouter);
+    mainRouter.use("/transaction", transactionsRouter);
 
 export default mainRouter;
