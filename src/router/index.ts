@@ -2,7 +2,7 @@ import { Router } from "express";
 import { authRouter } from "./auth.router";
 import { profileRouter } from "./profile.router";
 import { categoryRouter } from "./category.router";
-import { productRouter } from "./product.model";
+import { productRouter } from "./product.router";
 import { promoRouter } from "./promo.router";
 import { testimonialRouter } from "./testimonial.router";
 import { sizeProductRouter } from "./sizeProduct.router";
