@@ -54,7 +54,7 @@ categoryRouter.post("/add", create);
  * @swagger
  * /category:
  *   get:
- *     summary: Get all categories
+ *     summary: Fetch all categories
  *     description: Retrieves all available product categories.
  *     operationId: getAllCategories
  *     tags:

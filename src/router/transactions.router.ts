@@ -153,12 +153,11 @@ export const transactionsRouter = Router()
  */
 transactionsRouter.post("/add", create)
 
-
 /**
  * @swagger
  * /transaction/history-order/{uuid}:
  *   get:
- *     summary: Get transaction history of a specific user
+ *     summary: Fetch transaction history of a specific user
  *     description: Retrieves the transaction history of a user, with optional filters for pagination and status.
  *     operationId: getTransactionHistory
  *     tags:
@@ -249,7 +248,7 @@ transactionsRouter.get("/history-order/:uuid", FetchAll);
  * @swagger
  * /transaction/detail-history/{uuid}:
  *   get:
- *     summary: Get detailed transaction history for a specific transaction
+ *     summary: Fetch detailed transaction history for a specific transaction
  *     description: Retrieves the detailed history of a user's transaction, including product details and payment/shipping information.
  *     operationId: getTransactionDetailHistory
  *     tags:

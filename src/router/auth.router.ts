@@ -11,7 +11,7 @@ export const authRouter = Router();
 
 /**
  * @swagger
- * user/register:
+ * /user/register:
  *   post:
  *     summary: Register a new user
  *     description: Create a new user account.
@@ -79,7 +79,7 @@ authRouter.post("/register", register);
 
 /**
  * @swagger
- * user/login:
+ * /user/login:
  *   post:
  *     summary: Login a user
  *     description: Authenticate a user and return a token.
