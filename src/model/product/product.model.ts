@@ -36,7 +36,7 @@ export interface IProductPaginationQuery {
 
 export interface IProductQuery extends IProductPaginationQuery {
   searchText: string;
-  category: number;
+  category: string;
   minimumPrice: number;
   maximumPrice: number;
   sortBy?: string;

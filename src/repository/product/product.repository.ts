@@ -1,17 +1,41 @@
 import { Pool, PoolClient, QueryResult } from "pg";
-import { IDataProduct, IImgProduct, IProductBody, IProductImage, IProductQuery,} from "../../model/product/product.model";
+import {
+  IDataProduct,
+  IImgProduct,
+  IProductBody,
+  IProductImage,
+  IProductQuery,
+} from "../../model/product/product.model";
 import db from "../../configs/pg";
 
-export const createData = (body: IProductBody): Promise<QueryResult<IDataProduct>> => {
+export const createData = (
+  body: IProductBody
+): Promise<QueryResult<IDataProduct>> => {
   const query = `insert into products ( product_name , product_price , product_description , category_id , product_stock)
     values ($1, $2, $3, $4, $5)
     returning id ,  product_name , product_price , product_description , category_id , product_stock , created_at `;
-  const { product_name, product_price, product_description, category_id, product_stock,} = body;
-  const values = [ product_name, product_price, product_description, category_id, product_stock,];
+  const {
+    product_name,
+    product_price,
+    product_description,
+    category_id,
+    product_stock,
+  } = body;
+  const values = [
+    product_name,
+    product_price,
+    product_description,
+    category_id,
+    product_stock,
+  ];
   return db.query(query, values);
 };
 
-export const createDataImage = ( dbPool: Pool | PoolClient, id: string, imgUrl?: string): Promise<QueryResult<IProductImage>> => {
+export const createDataImage = (
+  dbPool: Pool | PoolClient,
+  id: string,
+  imgUrl?: string
+): Promise<QueryResult<IProductImage>> => {
   let query = `insert into image_product ( img_product , product_id)
       values `;
   const values: (string | null)[] = [];
@@ -22,7 +46,9 @@ export const createDataImage = ( dbPool: Pool | PoolClient, id: string, imgUrl?:
   return dbPool.query(query, values);
 };
 
-export const getAllData = async (queryParams: IProductQuery): Promise<QueryResult<IDataProduct>> => {
+export const getAllData = async (
+  queryParams: IProductQuery
+): Promise<QueryResult<IDataProduct>> => {
   let query = `
       SELECT products.id, products.product_name, products.product_price, products.product_description, products.rating, p2.discount_price, c.category_name,
          (SELECT img_product FROM image_product WHERE product_id = products.id LIMIT 1) AS img_product
@@ -32,8 +58,17 @@ export const getAllData = async (queryParams: IProductQuery): Promise<QueryResul
       WHERE products.isdelete = false
   `;
   let value: any[] = [];
-  
-  const { category, maximumPrice, minimumPrice, searchText, favorite, sortBy, page, limit} = queryParams;
+
+  const {
+    category,
+    maximumPrice,
+    minimumPrice,
+    searchText,
+    favorite,
+    sortBy,
+    page,
+    limit,
+  } = queryParams;
 
   if (favorite) {
     query += `  AND rating > 4`;
@@ -44,31 +79,31 @@ export const getAllData = async (queryParams: IProductQuery): Promise<QueryResul
     value.push(`%${searchText}%`);
   }
 
-  if (minimumPrice !== undefined && maximumPrice !== undefined && maximumPrice > minimumPrice) {
-    query += ` AND product_price BETWEEN $${value.length + 1} AND $${value.length + 2}`;
+  if (
+    minimumPrice !== undefined &&
+    maximumPrice !== undefined &&
+    maximumPrice > minimumPrice
+  ) {
+    query += ` AND product_price BETWEEN $${value.length + 1} AND $${
+      value.length + 2
+    }`;
     value.push(minimumPrice, maximumPrice);
   }
 
-  const categoryMap: { [key: number]: string } = {
-    1: "Coffee",
-    2: "Non Coffee",
-    3: "Foods",
-    4: "Add-On",
-  };
-
-  const categorys = Number(category);
-  if (typeof categorys === 'number' && categoryMap[categorys]) {
-    query += ` AND category_name ='${categoryMap[categorys]}'`; 
+  const categoryMap = ["Coffee", "Non Coffee", "Foods", "Add-On"];
+  if (category && categoryMap.includes(category)) {
+    query += ` AND category_name = $${value.length + 1}`;
+    value.push(category);
   }
 
   if (sortBy) {
     const orderByMap: { [key: string]: string } = {
-      "cheapest": "product_price ASC",
-      "priciest": "product_price DESC",
+      cheapest: "product_price ASC",
+      priciest: "product_price DESC",
       "a-z": "product_name ASC",
       "z-a": "product_name DESC",
-      "latest": "created_at ASC",
-      "longest": "created_at DESC",
+      latest: "created_at ASC",
+      longest: "created_at DESC",
     };
     if (orderByMap[sortBy.toLowerCase()]) {
       query += ` ORDER BY ${orderByMap[sortBy.toLowerCase()]}`;
@@ -88,7 +123,9 @@ export const getAllData = async (queryParams: IProductQuery): Promise<QueryResul
   return db.query(query, value);
 };
 
-export const getDetailData = async ( uuid: string): Promise<QueryResult<IDataProduct>> => {
+export const getDetailData = async (
+  uuid: string
+): Promise<QueryResult<IDataProduct>> => {
   let query = `select p.id , p.product_name ,  p.product_price ,  p2.discount_price ,  p.product_description,  p.product_stock, c.category_name , p.created_at,  p.updated_at
         from products p 
         inner join categories c on p.category_id = c.id 
@@ -97,7 +134,9 @@ export const getDetailData = async ( uuid: string): Promise<QueryResult<IDataPro
   return db.query(query, [uuid]);
 };
 
-export const getDetailProductImg = async (uuid: string): Promise<QueryResult<IDataProduct>> => {
+export const getDetailProductImg = async (
+  uuid: string
+): Promise<QueryResult<IDataProduct>> => {
   let query = `SELECT  p.uuid, (SELECT img_product FROM image_product WHERE product_id = p.id LIMIT 1) AS img_product, p.product_name, p.product_price, p2.discount_price
   FROM 
     products p
@@ -110,7 +149,10 @@ WHERE
   return db.query(query, [uuid]);
 };
 
-export const getImgData = async ( dbPool: Pool | PoolClient, id: string): Promise<QueryResult<IImgProduct>> => {
+export const getImgData = async (
+  dbPool: Pool | PoolClient,
+  id: string
+): Promise<QueryResult<IImgProduct>> => {
   let query = `SELECT
   MAX(CASE WHEN rn = 1 THEN img_product ELSE NULL END) AS img_1,
   MAX(CASE WHEN rn = 2 THEN img_product ELSE NULL END) AS img_2,
@@ -125,12 +167,18 @@ FROM (
   return dbPool.query(query, [id]);
 };
 
-export const getTotalData = (): Promise< QueryResult<{ total_product: string }>> => {
-  let query = "SELECT COUNT(*) AS total_product FROM products WHERE isdelete = false";
+export const getTotalData = (): Promise<
+  QueryResult<{ total_product: string }>
+> => {
+  let query =
+    "SELECT COUNT(*) AS total_product FROM products WHERE isdelete = false";
   return db.query(query);
 };
 
-export const updateData = async (id: string, body: IProductBody): Promise<QueryResult<IDataProduct>> => {
+export const updateData = async (
+  id: string,
+  body: IProductBody
+): Promise<QueryResult<IDataProduct>> => {
   let queryParts: string[] = [];
   const values: any[] = [];
   let hasUpdates = false;
@@ -176,39 +224,40 @@ export const updateData = async (id: string, body: IProductBody): Promise<QueryR
   if (hasUpdates) {
     const query = `
       UPDATE products 
-      SET ${queryParts.join(', ')}, updated_at = NOW() 
+      SET ${queryParts.join(", ")}, updated_at = NOW() 
       WHERE id = $${values.length + 1} 
       RETURNING id , product_name, product_price, product_description, category_id, product_stock, updated_at;
     `;
     values.push(id);
 
-
-    return await db.query(query, values); 
+    return await db.query(query, values);
   } else {
-    throw new Error('No fields to update');
+    throw new Error("No fields to update");
   }
 };
 
 export const deleteImage = (id: string) => {
-  const query = `DELETE FROM public.image_product WHERE product_id = $1`
+  const query = `DELETE FROM public.image_product WHERE product_id = $1`;
   const value = [id];
-  return db.query(query , value)
-}
+  return db.query(query, value);
+};
 
 export const DeleteData = async (uuid: string): Promise<string> => {
-  const query = 'UPDATE products SET isdelete = true WHERE id = $1';
+  const query = "UPDATE products SET isdelete = true WHERE id = $1";
   try {
     await db.query(query, [uuid]);
-    return 'Product successfully deleted';
+    return "Product successfully deleted";
   } catch (err: unknown) {
     if (err instanceof Error) {
       throw new Error(`Failed to delete product: ${err.message}`);
     }
-    throw new Error('An unknown error occurred while deleting the product.');
+    throw new Error("An unknown error occurred while deleting the product.");
   }
 };
 
-export const getDetailSingleImageData = (uuid:string): Promise<QueryResult<IDataProduct>> => {
+export const getDetailSingleImageData = (
+  uuid: string
+): Promise<QueryResult<IDataProduct>> => {
   let query = `select (SELECT img_product
              FROM image_product
              WHERE product_id = p.id

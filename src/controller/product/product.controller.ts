@@ -151,7 +151,6 @@ export const FetchAll = async (
   res: Response<IProductResponse>
 ) => {
   try {
-    console.log("Incoming category:", req.query.category);
     const result = await getAllData(req.query);
     if (!result) {
       return res.status(404).json({
@@ -207,7 +206,6 @@ export const FetchDetail = async (
 
   try {
     const { uuid } = req.params;
-    console.log(uuid);
 
     await client.query("BEGIN");
 
