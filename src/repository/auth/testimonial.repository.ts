@@ -30,7 +30,7 @@ export const getAllData = (
   if (page && limit) {
     const pageLimit = parseInt(limit, 10);
     const offset = (parseInt(page, 10) - 1) * pageLimit;
-    query += ` ORDER BY u.full_name LIMIT $${values.length + 1} OFFSET $${
+    query += ` ORDER BY p.full_name LIMIT $${values.length + 1} OFFSET $${
       values.length + 2
     }`;
     values.push(pageLimit, offset);
