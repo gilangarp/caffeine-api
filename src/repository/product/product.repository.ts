@@ -267,7 +267,7 @@ export const getDetailSingleImageData = (
              p2.discount_price 
     from products p 
     left join promos p2 on p.id = p2.product_id 
-    where p.uuid = $1
+    where p.id = $1
     `;
   return db.query(query, [uuid]);
 };

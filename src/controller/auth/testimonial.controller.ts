@@ -61,7 +61,8 @@ export const FetchAll = async (
     res.status(200).json({
         code: 200,
         msg: "success",
-        data: [result.rows[0]],
+        data: result.rows,
+        meta: response.meta,
       });
   } catch (error) {
     console.error("Error details:", error);
