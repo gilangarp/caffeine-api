@@ -46,7 +46,9 @@ export const createDataImage = (
   return dbPool.query(query, values);
 };
 
-export const getAllData = async (queryParams: IProductQuery): Promise<QueryResult<IDataProduct>> => {
+export const getAllData = async (
+  queryParams: IProductQuery
+): Promise<QueryResult<IDataProduct>> => {
   let query = `
       SELECT products.id, products.product_name, products.product_price, products.product_description, products.rating, p2.discount_price, c.category_name,
          (SELECT img_product FROM image_product WHERE product_id = products.id LIMIT 1) AS img_product
@@ -56,8 +58,17 @@ export const getAllData = async (queryParams: IProductQuery): Promise<QueryResul
       WHERE products.isdelete = false
   `;
   let value: any[] = [];
-  
-  const { category, maximumPrice, minimumPrice, searchText, favorite, sortBy, page, limit} = queryParams;
+
+  const {
+    category,
+    maximumPrice,
+    minimumPrice,
+    searchText,
+    favorite,
+    sortBy,
+    page,
+    limit,
+  } = queryParams;
 
   if (favorite) {
     query += `  AND rating > 4`;
@@ -68,8 +79,14 @@ export const getAllData = async (queryParams: IProductQuery): Promise<QueryResul
     value.push(`%${searchText}%`);
   }
 
-  if (minimumPrice !== undefined && maximumPrice !== undefined && maximumPrice > minimumPrice) {
-    query += ` AND product_price BETWEEN $${value.length + 1} AND $${value.length + 2}`;
+  if (
+    minimumPrice !== undefined &&
+    maximumPrice !== undefined &&
+    maximumPrice > minimumPrice
+  ) {
+    query += ` AND product_price BETWEEN $${value.length + 1} AND $${
+      value.length + 2
+    }`;
     value.push(minimumPrice, maximumPrice);
   }
 
@@ -81,18 +98,18 @@ export const getAllData = async (queryParams: IProductQuery): Promise<QueryResul
   };
 
   const categorys = Number(category);
-  if (typeof categorys === 'number' && categoryMap[categorys]) {
-    query += ` AND category_name ='${categoryMap[categorys]}'`; 
+  if (typeof categorys === "number" && categoryMap[categorys]) {
+    query += ` AND category_name ='${categoryMap[categorys]}'`;
   }
 
   if (sortBy) {
     const orderByMap: { [key: string]: string } = {
-      "cheapest": "product_price ASC",
-      "priciest": "product_price DESC",
+      cheapest: "product_price ASC",
+      priciest: "product_price DESC",
       "a-z": "product_name ASC",
       "z-a": "product_name DESC",
-      "latest": "created_at ASC",
-      "longest": "created_at DESC",
+      latest: "created_at ASC",
+      longest: "created_at DESC",
     };
     if (orderByMap[sortBy.toLowerCase()]) {
       query += ` ORDER BY ${orderByMap[sortBy.toLowerCase()]}`;
