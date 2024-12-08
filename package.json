@@ -11,6 +11,7 @@
     "build:prod": "npm run clean && tsc --build && cp -r ./node_modules ./dist/node_modules",
     "clean": "rimraf ./dist",
     "start": "node ./dist/app.js",
+    "dev":"nodemon --files app.ts",
     "start:dev": "cross-env NODE_ENV=development nodemon --files app.ts",
     "start:prod": "cross-env NODE_ENV=production nodemon --files app.ts"
   },
