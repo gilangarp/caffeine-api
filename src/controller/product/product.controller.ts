@@ -159,7 +159,7 @@ export const FetchAll = async (
         error: { message: "Data Not Found" },
       });
     }
-    const dataProduct = await getTotalData();
+    const dataProduct = await getTotalData(req.query);
 
     const page = parseInt((req.query.page as string) || "1");
 

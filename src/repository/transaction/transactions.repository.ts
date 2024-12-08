@@ -50,7 +50,6 @@ export const createDataProduct = (
       returning *`;
   const { product_id, size_id, fd_option_id } = product;
   const values = [transaction_id, product_id, size_id, fd_option_id];
-  console.log(query, values);
 
   return dbPool.query(query, values);
 };
@@ -121,7 +120,7 @@ export const getTotalTransaction = (
 export const getDetailData = (
   uuid: string
 ): Promise<QueryResult<IDataDetailHistory>> => {
-  const query = `select p2.full_name,p2.phone_number,p2.address, p.payment_method , s.shipping_method , st.status , t.grand_total
+  const query = `select p2.full_name,p2.phone_number,p2.address, t.order_number, TO_CHAR(t.created_at, 'DD Month YYYY "at" HH12:MI AM') AS created_at , p.payment_method , s.shipping_method , st.status , t.grand_total
   from transactions t 
   inner join users u on t.user_id = u.id 
   inner join profile p2 on u.id = p2.user_id 

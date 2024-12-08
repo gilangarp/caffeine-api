@@ -50,12 +50,19 @@ export const getAllData = async (
   queryParams: IProductQuery
 ): Promise<QueryResult<IDataProduct>> => {
   let query = `
-      SELECT products.id, products.product_name, products.product_price, products.product_description, products.rating, p2.discount_price, c.category_name,
-         (SELECT img_product FROM image_product WHERE product_id = products.id LIMIT 1) AS img_product
-      FROM products
-          INNER JOIN categories c ON products.category_id = c.id 
-          LEFT JOIN promos p2 ON products.id = p2.product_id
-      WHERE products.isdelete = false
+      SELECT p.id, p.product_name, p.product_price, p.product_description, p.rating, 
+             p2.discount_price, c.category_name,
+             img.img_product
+      FROM products p
+          INNER JOIN categories c ON p.category_id = c.id 
+          LEFT JOIN promos p2 ON p.id = p2.product_id
+          LEFT JOIN LATERAL (
+              SELECT img_product
+              FROM image_product
+              WHERE product_id = p.id
+              LIMIT 1
+          ) img ON true
+      WHERE p.isdelete = false
   `;
   let value: any[] = [];
 
@@ -120,6 +127,7 @@ export const getAllData = async (
     query += ` LIMIT $${value.length + 1} OFFSET $${value.length + 2}`;
     value.push(pageLimit, offset);
   }
+
   return db.query(query, value);
 };
 
@@ -167,12 +175,48 @@ FROM (
   return dbPool.query(query, [id]);
 };
 
-export const getTotalData = (): Promise<
-  QueryResult<{ total_product: string }>
-> => {
-  let query =
-    "SELECT COUNT(*) AS total_product FROM products WHERE isdelete = false";
-  return db.query(query);
+export const getTotalData = async (
+  queryParams: IProductQuery
+): Promise<QueryResult<{ total_product: string }>> => {
+  let query = `
+      SELECT COUNT(*) AS total_product
+      FROM products p
+          INNER JOIN categories c ON p.category_id = c.id 
+          LEFT JOIN promos p2 ON p.id = p2.product_id
+      WHERE p.isdelete = false
+  `;
+
+  let value: any[] = [];
+  const { category, maximumPrice, minimumPrice, searchText, favorite } =
+    queryParams;
+
+  if (favorite === true) {
+    query += ` AND rating > 4`;
+  }
+
+  if (searchText?.length > 0) {
+    query += ` AND product_name ILIKE $${value.length + 1}`;
+    value.push(`%${searchText}%`);
+  }
+
+  if (
+    minimumPrice !== undefined &&
+    maximumPrice !== undefined &&
+    maximumPrice > minimumPrice
+  ) {
+    query += ` AND product_price BETWEEN $${value.length + 1} AND $${
+      value.length + 2
+    }`;
+    value.push(minimumPrice, maximumPrice);
+  }
+
+  const categoryMap = ["Coffee", "Non Coffee", "Foods", "Add-On"];
+  if (category && categoryMap.includes(category)) {
+    query += ` AND category_name = $${value.length + 1}`;
+    value.push(category);
+  }
+
+  return db.query(query, value);
 };
 
 export const updateData = async (
