@@ -7,7 +7,6 @@ export interface ITransactionBody {
   status_id: number;
   subtotal: number;
   tax: number;
-  total_discount: number;
   grand_total: number;
 }
 

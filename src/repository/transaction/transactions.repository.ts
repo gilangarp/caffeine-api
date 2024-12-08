@@ -14,8 +14,8 @@ export const createData = (
   body: ITransactionBody,
   dbPool: Pool | PoolClient
 ): Promise<QueryResult<IDataTransaction>> => {
-  const query = `insert into transactions ( user_id , payments_id ,shipping_id , status_id , subtotal , tax , total_discount , grand_total )
-      values ($1,$2,$3,$4,$5,$6,$7,$8)
+  const query = `insert into transactions ( user_id , payments_id ,shipping_id , status_id , subtotal , tax  , grand_total )
+      values ($1,$2,$3,$4,$5,$6,$7)
       returning *`;
   const {
     user_id,
@@ -24,7 +24,6 @@ export const createData = (
     status_id,
     subtotal,
     tax,
-    total_discount,
     grand_total,
   } = body;
   const values = [
@@ -34,7 +33,6 @@ export const createData = (
     status_id,
     subtotal,
     tax,
-    total_discount,
     grand_total,
   ];
   return dbPool.query(query, values);
