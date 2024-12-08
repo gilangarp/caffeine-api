@@ -165,7 +165,7 @@ export const FetchAll = async (
 
     const totalData = parseInt(dataProduct.rows[0].total_product);
 
-    const totalPage = Math.ceil(totalData / parseInt(req.query.limit || "4"));
+    const totalPage = Math.ceil(totalData / parseInt(req.query.limit || "6"));
 
     return res.status(200).json({
       code: 200,
