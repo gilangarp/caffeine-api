@@ -46,36 +46,18 @@ export const createDataImage = (
   return dbPool.query(query, values);
 };
 
-export const getAllData = async (
-  queryParams: IProductQuery
-): Promise<QueryResult<IDataProduct>> => {
+export const getAllData = async (queryParams: IProductQuery): Promise<QueryResult<IDataProduct>> => {
   let query = `
-      SELECT p.id, p.product_name, p.product_price, p.product_description, p.rating, 
-             p2.discount_price, c.category_name,
-             img.img_product
-      FROM products p
-          INNER JOIN categories c ON p.category_id = c.id 
-          LEFT JOIN promos p2 ON p.id = p2.product_id
-          LEFT JOIN LATERAL (
-              SELECT img_product
-              FROM image_product
-              WHERE product_id = p.id
-              LIMIT 1
-          ) img ON true
-      WHERE p.isdelete = false
+      SELECT products.id, products.product_name, products.product_price, products.product_description, products.rating, p2.discount_price, c.category_name,
+         (SELECT img_product FROM image_product WHERE product_id = products.id LIMIT 1) AS img_product
+      FROM products
+          INNER JOIN categories c ON products.category_id = c.id 
+          LEFT JOIN promos p2 ON products.id = p2.product_id
+      WHERE products.isdelete = false
   `;
   let value: any[] = [];
-
-  const {
-    category,
-    maximumPrice,
-    minimumPrice,
-    searchText,
-    favorite,
-    sortBy,
-    page,
-    limit,
-  } = queryParams;
+  
+  const { category, maximumPrice, minimumPrice, searchText, favorite, sortBy, page, limit} = queryParams;
 
   if (favorite) {
     query += `  AND rating > 4`;
@@ -86,31 +68,31 @@ export const getAllData = async (
     value.push(`%${searchText}%`);
   }
 
-  if (
-    minimumPrice !== undefined &&
-    maximumPrice !== undefined &&
-    maximumPrice > minimumPrice
-  ) {
-    query += ` AND product_price BETWEEN $${value.length + 1} AND $${
-      value.length + 2
-    }`;
+  if (minimumPrice !== undefined && maximumPrice !== undefined && maximumPrice > minimumPrice) {
+    query += ` AND product_price BETWEEN $${value.length + 1} AND $${value.length + 2}`;
     value.push(minimumPrice, maximumPrice);
   }
 
-  const categoryMap = ["Coffee", "Non Coffee", "Foods", "Add-On"];
-  if (category && categoryMap.includes(category)) {
-    query += ` AND category_name = $${value.length + 1}`;
-    value.push(category);
+  const categoryMap: { [key: number]: string } = {
+    1: "Coffee",
+    2: "Non Coffee",
+    3: "Foods",
+    4: "Add-On",
+  };
+
+  const categorys = Number(category);
+  if (typeof categorys === 'number' && categoryMap[categorys]) {
+    query += ` AND category_name ='${categoryMap[categorys]}'`; 
   }
 
   if (sortBy) {
     const orderByMap: { [key: string]: string } = {
-      cheapest: "product_price ASC",
-      priciest: "product_price DESC",
+      "cheapest": "product_price ASC",
+      "priciest": "product_price DESC",
       "a-z": "product_name ASC",
       "z-a": "product_name DESC",
-      latest: "created_at ASC",
-      longest: "created_at DESC",
+      "latest": "created_at ASC",
+      "longest": "created_at DESC",
     };
     if (orderByMap[sortBy.toLowerCase()]) {
       query += ` ORDER BY ${orderByMap[sortBy.toLowerCase()]}`;
@@ -127,7 +109,6 @@ export const getAllData = async (
     query += ` LIMIT $${value.length + 1} OFFSET $${value.length + 2}`;
     value.push(pageLimit, offset);
   }
-
   return db.query(query, value);
 };
 
