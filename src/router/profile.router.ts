@@ -87,7 +87,7 @@ export const profileRouter = Router();
  *                       type: string
  *                       example: "Only JPG, PNG, or JPEG files are allowed."
  */
-profileRouter.patch("/setting/:id", singleCloudUploader("profile") , Update )
+profileRouter.patch("/setting/:id", singleCloudUploader("profile_image") , Update )
 
 /**
  * @swagger
