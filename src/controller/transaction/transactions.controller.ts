@@ -63,15 +63,16 @@ export const create = async (
 };
 
 export const FetchAll = async (
-  req: Request<{ id: string }, {}, {}, ITransactionQuery>,
+  req: Request<{ uuid: string }, {}, {}, ITransactionQuery>,
   res: Response
 ) => {
   try {
-    const { id } = req.params;
+    const { uuid } = req.params;
 
-    const result = await getAllData(req.query, id);
+    console.log("debugin id dari luar",uuid)
+    const result = await getAllData(req.query, uuid);
 
-    const dataTransaction = await getTotalTransaction(id);
+    const dataTransaction = await getTotalTransaction(uuid);
 
     if (dataTransaction.rows.length === 0) {
       return res.status(404).json({
