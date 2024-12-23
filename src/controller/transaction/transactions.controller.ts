@@ -67,9 +67,9 @@ export const FetchAll = async (
   res: Response
 ) => {
   try {
+    console.log("Request Query:", req.query);
     const { uuid } = req.params;
 
-    console.log("debugin id dari luar",uuid)
     const result = await getAllData(req.query, uuid);
 
     const dataTransaction = await getTotalTransaction(uuid);
