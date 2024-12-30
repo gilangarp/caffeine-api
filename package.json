@@ -11,7 +11,7 @@
     "build:prod": "npm run clean && tsc --build && cp -r ./node_modules ./dist/node_modules",
     "clean": "rimraf ./dist",
     "start": "node ./dist/app.js",
-    "dev":"nodemon --files app.ts",
+    "dev": "nodemon --files app.ts",
     "start:dev": "cross-env NODE_ENV=development nodemon --files app.ts",
     "start:prod": "cross-env NODE_ENV=production nodemon --files app.ts"
   },
@@ -27,6 +27,7 @@
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
     "jsonwebtoken": "^9.0.2",
+    "midtrans-client": "^1.4.2",
     "morgan": "^1.10.0",
     "multer": "^1.4.5-lts.1",
     "nodemailer": "^6.9.16",
