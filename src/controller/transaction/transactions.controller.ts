@@ -52,24 +52,26 @@ export const create = async (
         products: detailResults[index].rows,
       }));
 
+      req.body.address;
+
       const grossAmount = req.body.grand_total;
+      const fullName = req.body.full_name;
+      const [firstName, ...lastNameArray] = fullName.split(" ");
+      const lastName = lastNameArray.join(" ");
+
+      const email = req.body.user_email;
+      const address = req.body.address;
       let midtransResponse = null;
       let responseData = null;
 
-      if (req.body.payments_id !== 1) {
-        const products = req.body.products.map((product) => ({
-          name: product.product_name,
-          price: product.product_price,
-          quantity: product.quantity || 1,
-        }));
-
+      if (req.body.payment_type !== "Cash") {
         midtransResponse = await createMidtransTransaction({
           transaction_id,
           grossAmount,
-          full_name: req.body.full_name,
-          address: req.body.address,
-          user_email: req.body.user_email,
-          products,
+          first_name: firstName,
+          last_name: lastName,
+          email,
+          address,
         });
 
         responseData = {
@@ -95,7 +97,7 @@ export const create = async (
     } catch (err) {
       await client.query("ROLLBACK");
       console.error("Error processing transaction:", err);
-      throw err; // rethrow the error to be caught in the outer try-catch
+      throw err;
     } finally {
       client.release();
     }

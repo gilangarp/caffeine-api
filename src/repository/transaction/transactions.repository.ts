@@ -3,7 +3,6 @@ import {
   IDataDetailHistory,
   IDataProductDetailHistory,
   IDataTransaction,
-  ITransaction_product,
   ITransactionBody,
   ITransactionProduct,
   ITransactionQuery,
@@ -14,12 +13,11 @@ export const createData = (
   body: ITransactionBody,
   dbPool: Pool | PoolClient
 ): Promise<QueryResult<IDataTransaction>> => {
-  const query = `insert into transactions ( user_id , payments_id ,shipping_id , status_id , subtotal , tax  , grand_total , full_name , address , user_email)
+  const query = `insert into transactions ( user_id ,shipping_id , status_id , subtotal , tax  , grand_total , full_name , address , user_email , payment_type)
       values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
       returning *`;
   const {
     user_id,
-    payments_id,
     shipping_id,
     status_id,
     subtotal,
@@ -28,10 +26,10 @@ export const createData = (
     full_name,
     address,
     user_email,
+    payment_type,
   } = body;
   const values = [
     user_id,
-    payments_id,
     shipping_id,
     status_id,
     subtotal,
@@ -40,13 +38,14 @@ export const createData = (
     full_name,
     address,
     user_email,
+    payment_type,
   ];
   return dbPool.query(query, values);
 };
 
 export const createDataProduct = (
   transaction_id: string,
-  product: ITransaction_product,
+  product: ITransactionProduct,
   dbPool: Pool | PoolClient
 ): Promise<QueryResult<ITransactionProduct>> => {
   const query = `insert into transaction_products (  transaction_id , product_id , size_id  , fd_option_id , product_name , product_price)
