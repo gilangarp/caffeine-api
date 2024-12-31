@@ -3,7 +3,7 @@ import {
   create,
   FetchAll,
   FetchDetail,
-  TrxNotif,
+  TrxNotifWithUpdate,
 } from "../controller/transaction/transactions.controller";
 
 export const transactionsRouter = Router();
@@ -353,4 +353,4 @@ transactionsRouter.get("/history-order/:uuid", FetchAll);
  */
 transactionsRouter.get("/detail-history/:uuid", FetchDetail);
 
-transactionsRouter.get("/notification", TrxNotif);
+transactionsRouter.post("/notification", TrxNotifWithUpdate);

@@ -235,20 +235,42 @@ export const FetchDetail = async (
   }
 };
 
-export const UpdateStatusOnMidtransResponse = async (
+export const TrxNotifWithUpdate = async (
   req: Request<{}, {}, IUpdateStatusOnMidtransBody>,
   res: Response
 ) => {
-  const { transaction_id, status, grand_total, data } = req.body;
+  const {
+    gross_amount,
+    status_code,
+    fraud_status,
+    signature_key,
+    transaction_status,
+    payment_type,
+    order_id,
+  } = req.body;
+
+  if (!signature_key) {
+    return res.status(400).json({
+      code: 400,
+      msg: "Error",
+      error: {
+        message: "Missing or invalid 'data' or 'signature_key'",
+        details:
+          "The 'data' or 'signature_key' field is required in the request body.",
+      },
+    });
+  }
+
+  const statusCodeStr = String(status_code);
+  const grossAmountStr = String(gross_amount);
+  const serverKey = midtransConfig.serverKey;
 
   const hash = crypto
     .createHash("sha512")
-    .update(
-      `${transaction_id}${status}${grand_total}${midtransConfig.serverKey}`
-    )
+    .update(`${order_id}${statusCodeStr}${grossAmountStr}${serverKey}`)
     .digest("hex");
 
-  if (data.signature_key !== hash) {
+  if (signature_key !== hash) {
     return res.status(400).json({
       code: 400,
       msg: "Error",
@@ -261,15 +283,21 @@ export const UpdateStatusOnMidtransResponse = async (
   }
 
   try {
-    let transactionStatus = data.transaction_status;
-    let fraudStatus = data.fraud_status;
-    switch (transactionStatus) {
+    const response = await getBytransactionById(order_id);
+    if (!response) {
+      return res.status(404).json({
+        code: 404,
+        msg: "Transaction not found",
+      });
+    }
+
+    switch (transaction_status) {
       case "capture":
-        if (fraudStatus === "accept") {
+        if (fraud_status === "accept") {
           const transaction = await updateTransactionsStatus(
-            transaction_id,
+            order_id,
             3,
-            data.payment_type
+            payment_type
           );
           return res.status(200).json({
             code: 200,
@@ -278,39 +306,37 @@ export const UpdateStatusOnMidtransResponse = async (
           });
         }
         break;
+
       case "settlement":
         const settlementTransaction = await updateTransactionsStatus(
-          transaction_id,
+          order_id,
           3,
-          data.payment_type
+          payment_type
         );
         return res.status(200).json({
           code: 200,
           msg: "Transaction settled",
           data: settlementTransaction,
         });
+
       case "cancel":
       case "deny":
       case "expire":
-        const canceledTransaction = await updateTransactionsStatus(
-          transaction_id,
-          2
-        );
+        const canceledTransaction = await updateTransactionsStatus(order_id, 2);
         return res.status(200).json({
           code: 200,
           msg: "Transaction canceled",
           data: canceledTransaction,
         });
+
       case "pending":
-        const pendingTransaction = await updateTransactionsStatus(
-          transaction_id,
-          1
-        );
+        const pendingTransaction = await updateTransactionsStatus(order_id, 1);
         return res.status(200).json({
           code: 200,
           msg: "Transaction pending",
           data: pendingTransaction,
         });
+
       default:
         return res.status(400).json({
           code: 400,
@@ -319,7 +345,6 @@ export const UpdateStatusOnMidtransResponse = async (
         });
     }
   } catch (error) {
-    console.error("Error details:", error);
     if (error instanceof Error) {
       return res.status(500).json({
         code: 500,
@@ -340,28 +365,4 @@ export const UpdateStatusOnMidtransResponse = async (
       });
     }
   }
-};
-
-export const TrxNotif = async (
-  req: Request<{}, {}, IUpdateStatusOnMidtransBody>,
-  res: Response
-) => {
-  const { transaction_id, data } = req.body;
-
-  if (transaction_id && data) {
-    try {
-      const response = await getBytransactionById(transaction_id);
-      if (response) {
-        const result = await UpdateStatusOnMidtransResponse(req, res);
-        console.log("Result:", result);
-      }
-    } catch (error) {
-      console.error("Error in TrxNotif:", error);
-    }
-  }
-
-  return res.status(200).json({
-    code: 200,
-    msg: "Success",
-  });
 };

@@ -63,14 +63,13 @@ export interface IDataProductDetailHistory {
 
 export interface IUpdateStatusOnMidtransBody {
   transaction_id: string;
-  status: string;
-  grand_total: string;
-  data: {
-    signature_key: string;
-    transaction_status: string;
-    fraud_status: string;
-    payment_type: string;
-  };
+  transaction_status: string;
+  gross_amount: number;
+  payment_type: string;
+  signature_key: string;
+  fraud_status: string;
+  status_code: number;
+  order_id: string;
 }
 
 export interface ITransactionWithDetailsBody

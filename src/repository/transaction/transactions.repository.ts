@@ -172,7 +172,7 @@ export const updateTransactionsStatus = (
   payment_type?: string
 ) => {
   const query = `
-    UPDATE transaction_products 
+    UPDATE transactions 
     SET status_id = $2, payment_type = $3 
     WHERE id = $1
   `;
@@ -181,6 +181,6 @@ export const updateTransactionsStatus = (
 };
 
 export const getBytransactionById = (transaction_id: string) => {
-  const query = `select * from transactions id = $1`;
+  const query = `select * from transactions where id = $1`;
   return db.query(query, [transaction_id]);
 };
