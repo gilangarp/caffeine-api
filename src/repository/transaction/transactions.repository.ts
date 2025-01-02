@@ -3,7 +3,6 @@ import {
   IDataDetailHistory,
   IDataProductDetailHistory,
   IDataTransaction,
-  ITransaction_product,
   ITransactionBody,
   ITransactionProduct,
   ITransactionQuery,
@@ -14,40 +13,54 @@ export const createData = (
   body: ITransactionBody,
   dbPool: Pool | PoolClient
 ): Promise<QueryResult<IDataTransaction>> => {
-  const query = `insert into transactions ( user_id , payments_id ,shipping_id , status_id , subtotal , tax  , grand_total )
-      values ($1,$2,$3,$4,$5,$6,$7)
+  const query = `insert into transactions ( user_id ,shipping_id , status_id , subtotal , tax  , grand_total , full_name , address , user_email , payment_type)
+      values ($1,$2,$3,$4,$5,$6,$7,$8,$9,$10)
       returning *`;
   const {
     user_id,
-    payments_id,
     shipping_id,
     status_id,
     subtotal,
     tax,
     grand_total,
+    full_name,
+    address,
+    user_email,
+    payment_type,
   } = body;
   const values = [
     user_id,
-    payments_id,
     shipping_id,
     status_id,
     subtotal,
     tax,
     grand_total,
+    full_name,
+    address,
+    user_email,
+    payment_type,
   ];
   return dbPool.query(query, values);
 };
 
 export const createDataProduct = (
   transaction_id: string,
-  product: ITransaction_product,
+  product: ITransactionProduct,
   dbPool: Pool | PoolClient
 ): Promise<QueryResult<ITransactionProduct>> => {
-  const query = `insert into transaction_products (  transaction_id , product_id , size_id  , fd_option_id)
-      values ($1,$2,$3,$4)
+  const query = `insert into transaction_products (  transaction_id , product_id , size_id  , fd_option_id , product_name , product_price)
+      values ($1,$2,$3,$4,$5,$6)
       returning *`;
-  const { product_id, size_id, fd_option_id } = product;
-  const values = [transaction_id, product_id, size_id, fd_option_id];
+  const { product_id, size_id, fd_option_id, product_name, product_price } =
+    product;
+  const values = [
+    transaction_id,
+    product_id,
+    size_id,
+    fd_option_id,
+    product_name,
+    product_price,
+  ];
 
   return dbPool.query(query, values);
 };
@@ -151,4 +164,23 @@ export const getDetailDataProduct = (
     inner  join shippings s on t.shipping_id = s.id 
     where t.id = $1`;
   return db.query(query, [uuid]);
+};
+
+export const updateTransactionsStatus = (
+  transaction_id: string,
+  transaction_status: number,
+  payment_type?: string
+) => {
+  const query = `
+    UPDATE transactions 
+    SET status_id = $2, payment_type = $3 
+    WHERE id = $1
+  `;
+  const values = [transaction_id, transaction_status, payment_type || null];
+  return db.query(query, values);
+};
+
+export const getBytransactionById = (transaction_id: string) => {
+  const query = `select * from transactions where id = $1`;
+  return db.query(query, [transaction_id]);
 };

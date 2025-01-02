@@ -2,7 +2,10 @@ import { IBasicResponse } from "../response";
 
 export interface ITransactionBody {
   user_id: number;
-  payments_id: number;
+  full_name: string;
+  user_email: string;
+  address: string;
+  payment_type: string;
   shipping_id: number;
   status_id: number;
   subtotal: number;
@@ -10,25 +13,24 @@ export interface ITransactionBody {
   grand_total: number;
 }
 
-export interface IDataTransaction extends ITransactionBody {
+export interface IDataTransaction {
   id: string;
-  created_date: string;
-  updated_at?: string;
+  token?: string;
+  redirect_url?: string;
+  payment_method?: string;
+  status?: string;
+  product_name?: string;
+  product_price?: number;
 }
 
-export interface ITransaction_product {
+export interface ITransactionProduct {
   transaction_id: string;
   product_id: string;
   size_id: number;
   fd_option_id?: string;
-}
-
-export interface ITransactionProduct {
-  sizes_id: number;
-  products_id: number;
-  transactions_id: string;
-  promo_id: number;
-  subtotal: number;
+  product_name: string;
+  product_price: number;
+  quantity?: number;
 }
 
 export interface ITransactionQuery {
@@ -59,16 +61,21 @@ export interface IDataProductDetailHistory {
   shipping_method: string;
 }
 
-interface ITransaction_Product {
+export interface IUpdateStatusOnMidtransBody {
   transaction_id: string;
-  product_id: string;
-  size_id: number;
+  transaction_status: string;
+  gross_amount: number;
+  payment_type: string;
+  signature_key: string;
+  fraud_status: string;
+  status_code: number;
+  order_id: string;
 }
 
 export interface ITransactionWithDetailsBody
-  extends ITransaction_product,
+  extends ITransactionProduct,
     ITransactionBody {
-  products: ITransaction_Product[];
+  products: ITransactionProduct[];
 }
 
 export interface ITransactionResponse extends IBasicResponse {

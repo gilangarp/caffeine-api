@@ -1,7 +1,12 @@
-import { Router } from "express"
-import { create, FetchAll, FetchDetail } from "../controller/transaction/transactions.controller"
+import { Router } from "express";
+import {
+  create,
+  FetchAll,
+  FetchDetail,
+  TrxNotifWithUpdate,
+} from "../controller/transaction/transactions.controller";
 
-export const transactionsRouter = Router()
+export const transactionsRouter = Router();
 
 /**
  * @swagger
@@ -151,7 +156,7 @@ export const transactionsRouter = Router()
  *                               type: integer
  *                               example: 2
  */
-transactionsRouter.post("/add", create)
+transactionsRouter.post("/add", create);
 
 /**
  * @swagger
@@ -347,3 +352,5 @@ transactionsRouter.get("/history-order/:uuid", FetchAll);
  *                               example: "Dine in"
  */
 transactionsRouter.get("/detail-history/:uuid", FetchDetail);
+
+transactionsRouter.post("/notification", TrxNotifWithUpdate);
