@@ -27,9 +27,9 @@ export const createMidtransTransaction = async ({
       address: address,
     },
     callbacks: {
-      finish: `${process.env.FRONT_END_URL}/order-status?transaction_id=${transaction_id}`,
-      error: `${process.env.FRONT_END_URL}/order-status?transaction_id=${transaction_id}`,
-      pending: `${process.env.FRONT_END_URL}/order-status?transaction_id=${transaction_id}`,
+      finish: `${process.env.FRONT_END_URL}/history-order`,
+      error: `${process.env.FRONT_END_URL}/history-order`,
+      pending: `${process.env.FRONT_END_URL}/history-order`,
     },
   };
 
