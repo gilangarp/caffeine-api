@@ -27,11 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(
   cors({
-    origin: [
-      "http://localhost:5173",
-      "https://98aa-115-178-237-231.ngrok-free.app",
-      "https://caffeine-app-iota.vercel.app",
-    ],
+    origin: ["http://localhost:5173", "https://caffeine-app-iota.vercel.app"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
