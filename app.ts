@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: false }));
 
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://caffeine-app-iota.vercel.app"],
+    origin: ["*"],
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "HEAD", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
     credentials: true,
