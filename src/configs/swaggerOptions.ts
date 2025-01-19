@@ -10,8 +10,12 @@ const swaggerOptions: Options = {
     },
     servers: [
       {
-        url: ["http://localhost:8080", "https://caffeine-api-pi.vercel.app"],
+        url: "http://localhost:8080",
         description: "Development server",
+      },
+      {
+        url: "https://caffeine-api-pi.vercel.app",
+        description: "Production server",
       },
     ],
   },
