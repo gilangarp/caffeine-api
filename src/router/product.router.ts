@@ -1,9 +1,17 @@
 import { Router } from "express";
 import { multiCloudUploader } from "../middleware/upload";
 import { authorization } from "../middleware/authorization.middleware";
-import { create, Delete, FetchAll, FetchDetail, FetchSingleImageDetail, update, updateImage } from "../controller/product/product.controller";
+import {
+  create,
+  Delete,
+  FetchAll,
+  FetchDetail,
+  FetchSingleImageDetail,
+  update,
+  updateImage,
+} from "../controller/product/product.controller";
 
-export const productRouter = Router()
+export const productRouter = Router();
 
 /**
  * @swagger
@@ -115,7 +123,12 @@ export const productRouter = Router()
  *                   type: string
  *                   example: "Invalid input data"
  */
-productRouter.post("/add", multiCloudUploader("imageHandler", 3),authorization(['admin']) , create);
+productRouter.post(
+  "/add",
+  multiCloudUploader("imageHandler", 3),
+  authorization(["admin"]),
+  create
+);
 
 /**
  * @swagger
@@ -249,7 +262,7 @@ productRouter.post("/add", multiCloudUploader("imageHandler", 3),authorization([
  *                       type: string
  *                       example: "http://localhost:8080/product?searchText=&minimumPrice=&maximumPrice=&limit=6&page=2&sortBy=a-z&category=&favorite=true"
  */
-productRouter.get("/",FetchAll);
+productRouter.get("/", FetchAll);
 
 /**
  * @swagger
@@ -310,7 +323,12 @@ productRouter.get("/",FetchAll);
  *                         type: string
  *                         example: "edaf3e24-1351-4dca-8efb-ee5d9575b4b5"
  */
-productRouter.patch("/setting/image/:uuid",multiCloudUploader("imageHandler", 3),authorization(['admin']),updateImage);
+productRouter.patch(
+  "/setting/image/:uuid",
+  multiCloudUploader("imageHandler", 3),
+  authorization(["admin"]),
+  updateImage
+);
 
 /**
  * @swagger
@@ -403,7 +421,7 @@ productRouter.patch("/setting/image/:uuid",multiCloudUploader("imageHandler", 3)
  *                         format: date-time
  *                         example: "2024-11-11T04:26:19.154Z"
  */
-productRouter.patch("/setting/:uuid",authorization(['admin']), update);
+productRouter.patch("/setting/:uuid", authorization(["admin"]), update);
 
 /**
  * @swagger
@@ -487,9 +505,9 @@ productRouter.patch("/setting/:uuid",authorization(['admin']), update);
  *                             type: string
  *                             example: "https://res.cloudinary.com/dxqmdtibz/image/upload/v1731298968/coffeeshops/product-edaf3e24-1351-4dca-8efb-ee5d9575b4b5-imageHandler-2.jpg"
  */
-productRouter.get("/detail/:uuid", FetchDetail)
+productRouter.get("/detail/:uuid", FetchDetail);
 
-productRouter.get("/detail-card/:uuid", FetchSingleImageDetail)
+productRouter.get("/detail-card/:uuid", FetchSingleImageDetail);
 
 /**
  * @swagger
@@ -523,4 +541,4 @@ productRouter.get("/detail-card/:uuid", FetchSingleImageDetail)
  *                   type: string
  *                   example: "Product successfully deleted"
  */
-productRouter.delete("/delete/:uuid",authorization(['admin']), Delete)
+productRouter.delete("/delete/:uuid", authorization(["admin"]), Delete);

@@ -1,8 +1,12 @@
 import { Router } from "express";
-import { create, Delete, FetchAll } from "../controller/product/promo.controller";
+import {
+  create,
+  Delete,
+  FetchAll,
+} from "../controller/product/promo.controller";
 import { authorization } from "../middleware/authorization.middleware";
 
-export const promoRouter = Router()
+export const promoRouter = Router();
 
 /**
  * @swagger
@@ -72,7 +76,7 @@ export const promoRouter = Router()
  *                         type: string
  *                         example: "15% off!"
  */
-promoRouter.post("/add/:id",authorization(['admin']), create)
+promoRouter.post("/add/:id", authorization(["admin"]), create);
 
 /**
  * @swagger
@@ -116,7 +120,7 @@ promoRouter.post("/add/:id",authorization(['admin']), create)
  *                         type: string
  *                         example: "Espresso Classic Delight"
  */
-promoRouter.get("/", FetchAll)
+promoRouter.get("/", FetchAll);
 
 /**
  * @swagger
@@ -153,4 +157,4 @@ promoRouter.get("/", FetchAll)
  *                   type: string
  *                   example: "Promo successfully deleted"
  */
-promoRouter.delete("/:id" ,authorization(['admin']), Delete)
+promoRouter.delete("/:id", authorization(["admin"]), Delete);

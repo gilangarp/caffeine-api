@@ -11,7 +11,10 @@ import {
 } from "../../repository/transaction/sizeProduct.repository";
 import { IDelateResponse } from "../../model/auth/user.model";
 
-export const create = async (req: Request<ISizeProductBody>, res: Response) => {
+export const create = async (
+  req: Request<{}, {}, ISizeProductBody>,
+  res: Response
+) => {
   try {
     const result = await createData(req.body);
     if (!result) {

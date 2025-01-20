@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { create, Delete, FetchAll, update } from "../controller/transaction/statusTransactions.controller";
+import {
+  create,
+  Delete,
+  FetchAll,
+  update,
+} from "../controller/transaction/statusTransactions.controller";
 import { authorization } from "../middleware/authorization.middleware";
 
 export const statusTransactionsRouter = Router();
@@ -41,7 +46,7 @@ export const statusTransactionsRouter = Router();
  *                   type: string
  *                   example: "Status successfully added"
  */
-statusTransactionsRouter.post("/add", create);
+statusTransactionsRouter.post("/add", authorization(["admin"]), create);
 
 /**
  * @swagger
@@ -87,7 +92,11 @@ statusTransactionsRouter.post("/add", create);
  *                   type: string
  *                   example: "Status successfully updated"
  */
-statusTransactionsRouter.patch("/setting/:id",authorization(['admin']),update);
+statusTransactionsRouter.patch(
+  "/setting/:id",
+  authorization(["admin"]),
+  update
+);
 
 /**
  * @swagger
@@ -124,7 +133,7 @@ statusTransactionsRouter.patch("/setting/:id",authorization(['admin']),update);
  *                         type: string
  *                         example: "Pending"
  */
-statusTransactionsRouter.get("/",FetchAll);
+statusTransactionsRouter.get("/", FetchAll);
 
 /**
  * @swagger
@@ -158,5 +167,8 @@ statusTransactionsRouter.get("/",FetchAll);
  *                   type: string
  *                   example: "Status product successfully deleted"
  */
-statusTransactionsRouter.delete("/delete/:id", Delete);
-
+statusTransactionsRouter.delete(
+  "/delete/:id",
+  authorization(["admin"]),
+  Delete
+);

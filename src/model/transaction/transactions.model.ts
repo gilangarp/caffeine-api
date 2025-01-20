@@ -34,10 +34,10 @@ export interface ITransactionProduct {
 }
 
 export interface ITransactionQuery {
-  page: string;
-  limit: string;
+  page?: string;
+  limit?: string;
   [key: string]: any;
-  status: string;
+  status?: string;
 }
 
 export interface IDataDetailHistory {

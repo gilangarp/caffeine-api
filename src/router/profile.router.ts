@@ -1,6 +1,7 @@
 import { Router } from "express";
 import { FetchDetail, Update } from "../controller/auth/profile.controller";
 import { singleCloudUploader } from "../middleware/upload";
+import { authorization } from "../middleware/authorization.middleware";
 
 export const profileRouter = Router();
 
@@ -87,7 +88,12 @@ export const profileRouter = Router();
  *                       type: string
  *                       example: "Only JPG, PNG, or JPEG files are allowed."
  */
-profileRouter.patch("/setting/:id", singleCloudUploader("profile_image") , Update )
+profileRouter.patch(
+  "/setting/:id",
+  singleCloudUploader("profile_image"),
+  authorization(["user"]),
+  Update
+);
 
 /**
  * @swagger
@@ -171,4 +177,4 @@ profileRouter.patch("/setting/:id", singleCloudUploader("profile_image") , Updat
  *                   type: string
  *                   example: "Internal server error"
  */
-profileRouter.get("/:id", FetchDetail)
+profileRouter.get("/:id", authorization(["user"]), FetchDetail);

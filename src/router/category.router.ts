@@ -1,7 +1,13 @@
 import { Router } from "express";
-import { create, Delete, FetchAll, update } from "../controller/product/category.controller";
+import {
+  create,
+  Delete,
+  FetchAll,
+  update,
+} from "../controller/product/category.controller";
+import { authorization } from "../middleware/authorization.middleware";
 
-export const categoryRouter = Router()
+export const categoryRouter = Router();
 
 /**
  * @swagger
@@ -48,7 +54,7 @@ export const categoryRouter = Router()
  *                         type: string
  *                         example: "Unique Beverages"
  */
-categoryRouter.post("/add", create);
+categoryRouter.post("/add", authorization(["admin"]), create);
 
 /**
  * @swagger
@@ -85,7 +91,7 @@ categoryRouter.post("/add", create);
  *                         type: string
  *                         example: "Coffee"
  */
-categoryRouter.get("/",FetchAll);
+categoryRouter.get("/", FetchAll);
 
 /**
  * @swagger
@@ -135,7 +141,7 @@ categoryRouter.get("/",FetchAll);
  *                       type: string
  *                       example: "Updated Category Name"
  */
-categoryRouter.patch("/setting/:id",update);
+categoryRouter.patch("/setting/:id", authorization(["admin"]), update);
 
 /**
  * @swagger
@@ -169,4 +175,4 @@ categoryRouter.patch("/setting/:id",update);
  *                   type: string
  *                   example: "Category successfully deleted"
  */
-categoryRouter.delete("/delete/:id" , Delete)
+categoryRouter.delete("/delete/:id", authorization(["admin"]), Delete);

@@ -126,7 +126,7 @@ export const create = async (
 };
 
 export const FetchAll = async (
-  req: Request<{ uuid: string }, {}, {}, ITransactionQuery>,
+  req: Request<{ uuid: string }, {}, ITransactionQuery>,
   res: Response
 ) => {
   try {

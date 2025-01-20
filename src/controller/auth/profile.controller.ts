@@ -1,7 +1,13 @@
 import { Request, Response } from "express";
-import { IDataUpdateProfileResponse, IDetailDataResponse } from "../../model/auth/profile.model";
+import {
+  IDataUpdateProfileResponse,
+  IDetailDataResponse,
+} from "../../model/auth/profile.model";
 import { cloudinarySingleUploader } from "../../helper/cloudinary";
-import { getDetailData, updateData } from "../../repository/auth/profile.repository";
+import {
+  getDetailData,
+  updateData,
+} from "../../repository/auth/profile.repository";
 
 export const Update = async (
   req: Request,
@@ -45,9 +51,23 @@ export const Update = async (
       data: [result.rows[0]],
     });
   } catch (error) {
-    console.error("Update error:", error);
     const errorMessage =
       error instanceof Error ? error.message : "Internal Server Error";
+
+    if (
+      error instanceof Error &&
+      error.message.includes(
+        'duplicate key value violates unique constraint "unique_phone_number"'
+      )
+    ) {
+      return res.status(409).json({
+        code: 409,
+        msg: "error",
+        error: {
+          message: "Phone number already exists",
+        },
+      });
+    }
 
     return res.status(500).json({
       code: 500,

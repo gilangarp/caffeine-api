@@ -6,6 +6,7 @@ import {
   register,
   update,
 } from "../controller/auth/auth.controller";
+import { authorization } from "../middleware/authorization.middleware";
 
 export const authRouter = Router();
 
@@ -229,7 +230,7 @@ authRouter.post("/login", login);
  *       500:
  *         description: Internal server error.
  */
-authRouter.get("/", FetchAll);
+authRouter.get("/", authorization(["admin"]), FetchAll);
 
 /**
  * Update User Settings (e.g., profile settings)
@@ -258,7 +259,7 @@ authRouter.get("/", FetchAll);
  *             user_email:
  *               type: string
  *               example: "coffee@gmail.com"
- *             user_pass: 
+ *             user_pass:
  *               type: string
  *               example: "admin123"
  *     responses:
@@ -287,7 +288,7 @@ authRouter.get("/", FetchAll);
  *                         type: string
  *                         example: "2024-11-11T03:28:56.079Z"
  */
-authRouter.patch("/setting/:id", update);
+authRouter.patch("/setting/:id", authorization(["admin", "user"]), update);
 
 /**
  * Delete User by ID
@@ -321,4 +322,4 @@ authRouter.patch("/setting/:id", update);
  *                   type: string
  *                   example: "User successfully deleted"
  */
-authRouter.delete("/delete/:id", Delete);
+authRouter.delete("/delete/:id", authorization(["admin", "user"]), Delete);

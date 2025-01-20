@@ -1,7 +1,8 @@
 import { Router } from "express";
 import { create, FetchAll } from "../controller/auth/testimonial.controller";
+import { authorization } from "../middleware/authorization.middleware";
 
-export const testimonialRouter = Router()
+export const testimonialRouter = Router();
 
 /**
  * @swagger
@@ -67,7 +68,7 @@ export const testimonialRouter = Router()
  *                         type: integer
  *                         example: 5
  */
-testimonialRouter.post("/add/:id", create);
+testimonialRouter.post("/add/:id", authorization(["user"]), create);
 
 /**
  * @swagger

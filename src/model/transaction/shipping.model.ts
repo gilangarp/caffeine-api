@@ -14,8 +14,8 @@ export interface IDataDelivery extends IDeliveryBody {
 }
 
 export interface IDataDeliveryResponse extends IBasicResponse {
-    data?: IDataDelivery[]
-  }
+  data?: IDataDelivery[];
+}
 
 export interface IDelateResponse extends IBasicResponse {
   msg: string;

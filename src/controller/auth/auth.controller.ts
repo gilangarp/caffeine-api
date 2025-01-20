@@ -160,7 +160,7 @@ export const login = async (
     if (!result.rows.length)
       throw new Error("The email you entered is incorrect");
 
-    const { user_pass: hash, id, role , isdelete  } = result.rows[0];
+    const { user_pass: hash, id, role, isdelete } = result.rows[0];
     if (isdelete) {
       return res.status(401).json({
         code: 401,
@@ -314,6 +314,21 @@ export const update = async (
           },
         });
       }
+    }
+
+    if (
+      err instanceof Error &&
+      err.message.includes(
+        'duplicate key value violates unique constraint "users_user_email_key"'
+      )
+    ) {
+      return res.status(409).json({
+        code: 409,
+        msg: "error",
+        error: {
+          message: "Email already exists",
+        },
+      });
     }
 
     return res.status(500).json({

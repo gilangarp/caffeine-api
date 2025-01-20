@@ -1,5 +1,10 @@
 import { Router } from "express";
-import { create, Delete, FetchAll, update } from "../controller/transaction/shipping.controller";
+import {
+  create,
+  Delete,
+  FetchAll,
+  update,
+} from "../controller/transaction/shipping.controller";
 import { authorization } from "../middleware/authorization.middleware";
 
 export const shippingRouter = Router();
@@ -77,7 +82,7 @@ export const shippingRouter = Router();
  *       500:
  *         description: Internal server error
  */
-shippingRouter.post("/add",create);
+shippingRouter.post("/add", authorization(["admin"]), create);
 
 /**
  * @swagger
@@ -205,7 +210,7 @@ shippingRouter.get("/", FetchAll);
  *                         type: integer
  *                         example: 0
  */
-shippingRouter.patch("/setting/:id",authorization(['admin']), update);
+shippingRouter.patch("/setting/:id", authorization(["admin"]), update);
 
 /**
  * @swagger
@@ -239,4 +244,4 @@ shippingRouter.patch("/setting/:id",authorization(['admin']), update);
  *                   type: string
  *                   example: "Delivery method successfully deleted"
  */
-shippingRouter.delete("/delete/:id" , Delete)
+shippingRouter.delete("/delete/:id", Delete);

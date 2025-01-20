@@ -21,8 +21,8 @@ export interface IUsersParams {
 }
 
 export interface IUsersQuery {
-  page: string;
-  limit: string;
+  page?: string;
+  limit?: string;
   [key: string]: any;
 }
 
@@ -35,11 +35,10 @@ export interface IUserProfileData {
   user_email: string;
 }
 
-export interface IUserProfileResponse extends IBasicResponse{
-  data?: IUserProfileData[]
+export interface IUserProfileResponse extends IBasicResponse {
+  data?: IUserProfileData[];
 }
 
-
-export interface IDelateResponse  extends IBasicResponse{
-  msg: string; 
+export interface IDelateResponse extends IBasicResponse {
+  msg: string;
 }

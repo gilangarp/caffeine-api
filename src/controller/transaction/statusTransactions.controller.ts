@@ -12,7 +12,7 @@ import {
 import { IDelateResponse } from "../../model/auth/user.model";
 
 export const create = async (
-  req: Request<IStatusTransactionBody>,
+  req: Request<{}, {}, IStatusTransactionBody>,
   res: Response<IStatusTransactionResponse>
 ) => {
   try {

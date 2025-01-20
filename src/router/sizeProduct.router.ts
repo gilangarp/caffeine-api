@@ -1,5 +1,11 @@
 import { Router } from "express";
-import { create, Delete, FetchAll, update } from "../controller/transaction/sizeProduct.controller";
+import {
+  create,
+  Delete,
+  FetchAll,
+  update,
+} from "../controller/transaction/sizeProduct.controller";
+import { authorization } from "../middleware/authorization.middleware";
 
 export const sizeProductRouter = Router();
 
@@ -54,7 +60,7 @@ export const sizeProductRouter = Router();
  *                       type: integer
  *                       example: 7000
  */
-sizeProductRouter.post("/add", create);
+sizeProductRouter.post("/add", authorization(["admin"]), create);
 
 /**
  * @swagger
@@ -94,7 +100,7 @@ sizeProductRouter.post("/add", create);
  *                         type: integer
  *                         example: 0
  */
-sizeProductRouter.get("/" , FetchAll)
+sizeProductRouter.get("/", FetchAll);
 
 /**
  * @swagger
@@ -158,7 +164,7 @@ sizeProductRouter.get("/" , FetchAll)
  *                         type: integer
  *                         example: 7000
  */
-sizeProductRouter.patch("/setting/:id" , update)
+sizeProductRouter.patch("/setting/:id", authorization(["admin"]), update);
 
 /**
  * @swagger
@@ -192,4 +198,4 @@ sizeProductRouter.patch("/setting/:id" , update)
  *                   type: string
  *                   example: "Size product successfully deleted"
  */
-sizeProductRouter.delete("/delete/:id", Delete);
+sizeProductRouter.delete("/delete/:id", authorization(["admin"]), Delete);
