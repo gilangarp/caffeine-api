@@ -248,11 +248,7 @@ transactionsRouter.post("/add", authorization(["admin", "user"]), create);
  *                       type: string
  *                       example: "http://localhost:8080/transaction/history-order/9d633644-08e6-4471-a652-00388ed2d09e?limit=5&page=2&status=3"
  */
-transactionsRouter.get(
-  "/history-order/:uuid",
-  authorization(["admin", "user"]),
-  FetchAll
-);
+transactionsRouter.get("/history-order/:uuid", FetchAll);
 
 /**
  * @swagger

@@ -1,6 +1,10 @@
 import { Request, Response } from "express";
 import { getLink } from "../../helper/getLink";
-import { createData, getAllData, getTotalTestimonialData } from "../../repository/auth/testimonial.repository";
+import {
+  createData,
+  getAllData,
+  getTotalTestimonialData,
+} from "../../repository/auth/testimonial.repository";
 import { IUsersQuery } from "../../model/auth/user.model";
 import { ITestimonialResponse } from "../../model/auth/testimonial.model";
 
@@ -43,10 +47,19 @@ export const FetchAll = async (
   try {
     const result = await getAllData(req.query);
     const dataUser = await getTotalTestimonialData();
+    if (!dataUser) {
+      return res.status(404).json({
+        code: 404,
+        msg: "Testimonial data not found",
+        error: {
+          message: "No testimonial data available",
+          details: "No additional error details",
+        },
+      });
+    }
     const page = parseInt((req.query.page as string) || "1");
     const totalData = parseInt(dataUser.rows[0].total_user);
     const totalPage = Math.ceil(totalData / parseInt(req.query.limit || "2"));
-    console.log(req.baseUrl);
     const response = {
       msg: "success",
       data: result.rows,
@@ -59,11 +72,11 @@ export const FetchAll = async (
       },
     };
     res.status(200).json({
-        code: 200,
-        msg: "success",
-        data: result.rows,
-        meta: response.meta,
-      });
+      code: 200,
+      msg: "success",
+      data: result.rows,
+      meta: response.meta,
+    });
   } catch (error) {
     console.error("Error details:", error);
     if (error instanceof Error) {
