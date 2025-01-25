@@ -11,6 +11,9 @@ import db from "../../configs/pg";
 
 export const createData = (
   body: ITransactionBody,
+  grand_total: number,
+  tax: number,
+  subtotal: number,
   dbPool: Pool | PoolClient
 ): Promise<QueryResult<IDataTransaction>> => {
   const query = `insert into transactions ( user_id ,shipping_id , status_id , subtotal , tax  , grand_total , full_name , address , user_email , payment_type)
@@ -20,9 +23,6 @@ export const createData = (
     user_id,
     shipping_id,
     status_id,
-    subtotal,
-    tax,
-    grand_total,
     full_name,
     address,
     user_email,
@@ -131,11 +131,10 @@ export const getTotalTransaction = (
 export const getDetailData = (
   uuid: string
 ): Promise<QueryResult<IDataDetailHistory>> => {
-  const query = `select p2.full_name,p2.phone_number,p2.address, t.order_number, TO_CHAR(t.created_at, 'DD Month YYYY "at" HH12:MI AM') AS created_at , p.payment_method , s.shipping_method , st.status , t.grand_total
+  const query = `select p2.full_name,p2.phone_number,p2.address, t.order_number, TO_CHAR(t.created_at, 'DD Month YYYY "at" HH12:MI AM') AS created_at , t.payment_type , s.shipping_method , st.status , t.grand_total
   from transactions t 
   inner join users u on t.user_id = u.id 
   inner join profile p2 on u.id = p2.user_id 
-  inner join payments p on t.payments_id = p.id 
   inner join shippings s on t.shipping_id = s.id 
   inner  join status_transactions st on t.status_id = st.id 
   WHERE t.id = $1`;

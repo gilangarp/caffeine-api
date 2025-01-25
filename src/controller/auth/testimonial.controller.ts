@@ -6,9 +6,15 @@ import {
   getTotalTestimonialData,
 } from "../../repository/auth/testimonial.repository";
 import { IUsersQuery } from "../../model/auth/user.model";
-import { ITestimonialResponse } from "../../model/auth/testimonial.model";
+import {
+  IDataTestimonialBody,
+  ITestimonialResponse,
+} from "../../model/auth/testimonial.model";
 
-export const create = async (req: Request, res: Response) => {
+export const create = async (
+  req: Request<{ id: string }, {}, IDataTestimonialBody>,
+  res: Response
+) => {
   const { id } = req.params;
   try {
     const result = await createData(req.body, id);

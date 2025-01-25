@@ -8,9 +8,14 @@ export interface ITransactionBody {
   payment_type: string;
   shipping_id: number;
   status_id: number;
-  subtotal: number;
-  tax: number;
-  grand_total: number;
+}
+
+export interface ITransactionProduct {
+  product_id: string;
+  size_id: number;
+  fd_option_id: string;
+  product_name: string;
+  product_price: number;
 }
 
 export interface IDataTransaction {
@@ -23,14 +28,19 @@ export interface IDataTransaction {
   product_price?: number;
 }
 
-export interface ITransactionProduct {
+export interface IMidtransTransaction {
   transaction_id: string;
-  product_id: string;
-  size_id: number;
-  fd_option_id?: string;
-  product_name: string;
-  product_price: number;
-  quantity?: number;
+  grossAmount: number;
+  full_name: string;
+  email: string;
+  address: string;
+}
+
+export interface IUserDataMidtrans {
+  full_name: string;
+  email: string;
+  address: string;
+  payment_type: string;
 }
 
 export interface ITransactionQuery {
@@ -79,7 +89,7 @@ export interface ITransactionWithDetailsBody
 }
 
 export interface ITransactionResponse extends IBasicResponse {
-  data?: IDataTransaction[];
+  data?: IDataTransaction;
 }
 
 interface Detail {

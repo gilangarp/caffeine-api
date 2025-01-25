@@ -18,115 +18,99 @@ import {
   updateTransactionsStatus,
 } from "../../repository/transaction/transactions.repository";
 import { getLink } from "../../helper/getLink";
-import { createMidtransTransaction } from "../../middleware/midtransHelper";
+import { createMidtransTransaction } from "../../helper/midtrans.helper";
 import crypto from "crypto";
 import midtransConfig from "../../configs/midtrans";
+import { calculate } from "../../utils/calculate";
+import { handleMidtransTransaction } from "../../services/teransaction/transactionService";
+import { processProductDetails } from "../../helper/processProductDetails";
 
 export const create = async (
   req: Request<{}, {}, ITransactionWithDetailsBody>,
   res: Response<ITransactionResponse>
 ) => {
+  const client = await db.connect();
   try {
-    const client = await db.connect();
-    try {
-      await client.query("BEGIN");
-
-      if (!req.body.products || req.body.products.length === 0) {
-        return res.status(400).json({
-          code: 400,
-          msg: "Product not found in request",
-        });
-      }
-
-      const orderResult = await createData(req.body, client);
-      const transaction_id = orderResult.rows[0].id;
-
-      const detailResultPromises = req.body.products.map((product) =>
-        createDataProduct(transaction_id, product, client)
-      );
-
-      const detailResults = await Promise.all(detailResultPromises);
-
-      const ordersWithDetails = orderResult.rows.map((order, index) => ({
-        ...order,
-        products: detailResults[index].rows,
-      }));
-
-      req.body.address;
-
-      const grossAmount = req.body.grand_total;
-      const fullName = req.body.full_name;
-      const [firstName, ...lastNameArray] = fullName.split(" ");
-      const lastName = lastNameArray.join(" ");
-
-      const email = req.body.user_email;
-      const address = req.body.address;
-      let midtransResponse = null;
-      let responseData = null;
-
-      if (req.body.payment_type !== "Cash") {
-        midtransResponse = await createMidtransTransaction({
-          transaction_id,
-          grossAmount,
-          first_name: firstName,
-          last_name: lastName,
-          email,
-          address,
-        });
-
-        responseData = {
-          id: transaction_id,
-          token: midtransResponse.token,
-          payment_method: "Midtrans",
-          redirect_url: midtransResponse.redirect_url,
-        };
-      } else {
-        responseData = {
-          id: transaction_id,
-          payment_method: "Cash",
-        };
-      }
-
-      await client.query("COMMIT");
-
-      return res.status(201).json({
-        code: 201,
-        msg: "Success",
-        data: [responseData],
-      });
-    } catch (err) {
-      await client.query("ROLLBACK");
-      console.error("Error processing transaction:", err);
-      throw err;
-    } finally {
-      client.release();
-    }
-  } catch (error) {
-    console.error("Error details:", error);
-    if (error instanceof Error) {
-      return res.status(500).json({
-        code: 500,
-        msg: error.message,
+    await client.query("BEGIN");
+    const productDetails = await processProductDetails(req.body.products);
+    if (!productDetails || productDetails.length === 0) {
+      return res.status(404).json({
+        msg: "Error ID Product",
         error: {
-          message: error.message,
-          details: error.stack || "No additional error details",
+          message: "Product Not Found",
         },
       });
-    } else {
+    }
+
+    const calculateProduct = await calculate(productDetails);
+    if (calculateProduct === null) {
       return res.status(500).json({
         code: 500,
         msg: "Internal Server Error",
+      });
+    }
+
+    const orderResult = await createData(
+      req.body,
+      calculateProduct.subtotal,
+      calculateProduct.tax,
+      calculateProduct.total,
+      client
+    );
+
+    const transaction_id = orderResult.rows[0].id;
+
+    const detailResultPromises = productDetails.map((product) =>
+      createDataProduct(transaction_id, product, client)
+    );
+
+    await Promise.all(detailResultPromises);
+
+    const userData = {
+      full_name: req.body.full_name,
+      email: req.body.user_email,
+      address: req.body.address,
+      payment_type: req.body.payment_type,
+    };
+
+    const responseData = await handleMidtransTransaction(
+      transaction_id,
+      calculateProduct.total,
+      userData
+    );
+
+    if (!responseData) {
+      return res.status(400).json({
+        msg: "Transaction failed",
         error: {
-          message: "Unknown error occurred",
-          details: "No additional error details",
+          message: "Unable to process payment with Midtrans",
         },
       });
     }
+
+    await client.query("COMMIT");
+
+    return res.status(201).json({
+      msg: "success",
+      data: responseData,
+    });
+  } catch (err) {
+    await client.query("ROLLBACK");
+    return res.status(500).json({
+      code: 500,
+      msg: "Internal Server Error",
+      error: {
+        message: "Unknown error occurred",
+        details: "No additional error details",
+      },
+    });
+  } finally {
+    client.release();
   }
 };
 
 export const FetchAll = async (
-  req: Request<{ uuid: string }, {}, ITransactionQuery>,
+  req: Request<{ uuid: string }, {}, {}, ITransactionQuery>,
   res: Response
 ) => {
   try {

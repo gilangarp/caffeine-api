@@ -1,19 +1,11 @@
-interface IMidtransTransaction {
-  transaction_id: string;
-  grossAmount: number;
-  first_name: string;
-  last_name: string;
-  email: string;
-  address: string;
-}
+import { IMidtransTransaction } from "../model/transaction/transactions.model";
 
 export const createMidtransTransaction = async ({
   transaction_id,
   grossAmount,
   address,
   email,
-  first_name,
-  last_name,
+  full_name,
 }: IMidtransTransaction) => {
   const payload = {
     transaction_details: {
@@ -21,8 +13,7 @@ export const createMidtransTransaction = async ({
       gross_amount: grossAmount,
     },
     customer_details: {
-      first_name: first_name,
-      last_name: last_name,
+      full_name: full_name,
       email: email,
       address: address,
     },

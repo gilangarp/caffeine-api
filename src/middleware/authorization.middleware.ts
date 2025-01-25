@@ -1,12 +1,12 @@
 import { NextFunction, Request, Response } from "express";
 import { SignOptions } from "jsonwebtoken";
-import jwt from 'jsonwebtoken';
+import jwt from "jsonwebtoken";
 import { IPayload } from "../model/auth/payload.model";
 import { AppParams } from "../model/param";
 import { IAuthResponse } from "../model/auth/auth.model";
 
 export const jwtOptions: SignOptions = {
-  expiresIn: "5m",
+  expiresIn: "1h",
   issuer: process.env.JWT_ISSUER,
 };
 

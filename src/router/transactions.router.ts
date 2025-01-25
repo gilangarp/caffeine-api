@@ -157,7 +157,7 @@ export const transactionsRouter = Router();
  *                               type: integer
  *                               example: 2
  */
-transactionsRouter.post("/add", authorization(["admin", "user"]), create);
+transactionsRouter.post("/add", authorization(["user"]), create);
 
 /**
  * @swagger
@@ -354,7 +354,7 @@ transactionsRouter.get("/history-order/:uuid", FetchAll);
  */
 transactionsRouter.get(
   "/detail-history/:uuid",
-  authorization(["user"]),
+  authorization(["user", "admin"]),
   FetchDetail
 );
 

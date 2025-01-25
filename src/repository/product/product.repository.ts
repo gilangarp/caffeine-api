@@ -140,6 +140,17 @@ export const getDetailData = async (
   return db.query(query, [uuid]);
 };
 
+export const getDetailProductData = async (
+  uuid: string
+): Promise<QueryResult<IDataProduct>> => {
+  let query = `select p.id , p.product_name ,  p.product_price ,  p2.discount_price ,  p.product_description,  p.product_stock, c.category_name , p.created_at,  p.updated_at
+        from products p 
+        inner join categories c on p.category_id = c.id 
+        LEFT JOIN promos p2 ON p.id = p2.product_id 
+        WHERE p.id = $1 AND p.isdelete = false`;
+  return db.query(query, [uuid]);
+};
+
 export const getDetailProductImg = async (
   uuid: string
 ): Promise<QueryResult<IDataProduct>> => {

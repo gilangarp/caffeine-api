@@ -11,7 +11,7 @@ export interface IDataTestimonial {
 export interface IDataTestimonialBody {
   user_id: string;
   comment: string;
-  rating: string;
+  rating: number;
 }
 
 export interface ITestimonialResponse extends IBasicResponse {
